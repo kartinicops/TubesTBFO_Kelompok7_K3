@@ -36,6 +36,6 @@ def convertToCNF(barisConverted):
 def writeGrammarFile(file, ruleDict):
   with open(file, "w") as cfg_file:
     for key, value in ruleDict.items():
-      cfg_file.write(key + " -> " + value + " ")
+      cfg_file.write(key + " -> " + value + "\n")
 
-writeGrammarFile("cnf.txt", convertToCNF(readGrammarFile("cfg.txt")))
+writeGrammarFile("./src/lib/grammar/cnf.txt", convertToCNF(readGrammarFile("./src/lib/grammar/cfg.txt")))
