@@ -49,6 +49,11 @@ MINUSMINUS -> minusminus
 ANDAND -> andand
 OROR -> oror
 STRING -> string
+INT -> int
 CHAR -> char
 COMMENT -> comment
 UNDERSCORE -> underscore
+PLUSEQUAL -> plusequal
+MINUSEQUAL -> minusequal
+TIMESEQUAL -> timesequal
+DIVEQUAL -> divequal
