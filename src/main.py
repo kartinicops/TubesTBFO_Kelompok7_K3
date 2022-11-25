@@ -1,5 +1,11 @@
 import argparse
 from tokenizer import *
+from lib.grammar.cfgtocnf import mapGrammar
+from lib.grammar.cfgtocnf import convertGrammar
+from lib.grammar.cfgtocnf import readGrammar
+from lib.grammar.cykparser import cykParser
+
+
 
 def bannerCompiler() :
   print()
@@ -29,6 +35,8 @@ f = arg.file
 for line in f:
   print(line)
     
-    
+
 bannerCompiler()
-createToken(arg.file.name)
+token = createToken(arg.file.name)
+grammarCNF = mapGrammar(convertGrammar(readGrammar(arg.file.name)))
+cykParser(token, grammarCNF)

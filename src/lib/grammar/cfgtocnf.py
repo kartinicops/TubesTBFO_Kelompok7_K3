@@ -1,41 +1,67 @@
 import keyword
-
 terminal = keyword.kwlist
-
 ruleDict = {}
 
-#Read txt
-def readGrammarFile(file):
-  with open(file) as cfg_file:
-    baris = cfg_file.readlines()
-    barisConverted = []
-    for i in range(len(baris)):
-      splitBaris = baris[i].replace("->", "").split()
-      barisConverted.append(splitBaris)
-  return barisConverted
+def readGrammar(file) :
+  grammar = []
+  with open(file) as f:
+    for line in f:
+      grammar.append(line.split())
+  return grammar
 
-#Convert to CNF
-def convertToCNF(barisConverted):
-  for i in range(len(barisConverted)):
-    if len(barisConverted[i]) == 2:
-      ruleDict[barisConverted[i][0]] = barisConverted[i][1]
-    elif len(barisConverted[i]) == 3:
-      ruleDict[barisConverted[i][0]] = barisConverted[i][1] + " " + barisConverted[i][2]
-    elif len(barisConverted[i]) == 4:
-      ruleDict[barisConverted[i][0]] = barisConverted[i][1] + " " + barisConverted[i][2]
-      ruleDict[barisConverted[i][0] + "'"] = barisConverted[i][3] + " " + barisConverted[i][0] + "'"
-    elif len(barisConverted[i]) == 5:
-      ruleDict[barisConverted[i][0]] = barisConverted[i][1] + " " + barisConverted[i][2]
-      ruleDict[barisConverted[i][0] + "'"] = barisConverted[i][3] + " " + barisConverted[i][0] + "'"
-      ruleDict[barisConverted[i][0] + "''"] = barisConverted[i][4] + " " + barisConverted[i][0] + "''"
+def displayGrammar(grammar) :
+  for rule in grammar :
+    print(rule[0], " -> ", end = "")
+    for i in range(1, len(rule)) :
+      print(rule[i], end = "")
+      print(" ", end = "")
+    print()
+
+def appendRule(rule):
+  global ruleDict
+  if rule[0] not in ruleDict:
+    ruleDict[rule[0]] = []
+  ruleDict[rule[0]].append(rule[1:])
+
+def convertGrammar(grammar):
+  global ruleDict
+  for rule in grammar:
+    if len(rule) == 2:
+      appendRule(rule)
     else:
-      print("Error")
-  return ruleDict
+      newRule = []
+      newRule.append(rule[0])
+      for i in range(1, len(rule) - 1):
+        newRule.append(rule[i])
+        newRule.append(rule[i] + "'")
+        appendRule(newRule)
+        newRule = []
+        newRule.append(rule[i] + "'")
+      newRule.append(rule[len(rule) - 1])
+      appendRule(newRule)
+  return ruleDict 
 
-#Write to txt
-def writeGrammarFile(file, ruleDict):
-  with open(file, "w") as cfg_file:
-    for key, value in ruleDict.items():
-      cfg_file.write(key + " -> " + value + "\n")
+def mapGrammar(grammar):
+    global terminal
+    newGrammar = {}
+    for rule in grammar:
+        if rule[0] not in newGrammar:
+            newGrammar[rule[0]] = []
+        if rule[1] in terminal:
+            newGrammar[rule[0]].append(rule[1])
+        else:
+            for i in grammar[rule[1]]:
+                newGrammar[rule[0]].append(i)
+    return newGrammar
 
-writeGrammarFile("./src/lib/grammar/cnf.txt", convertToCNF(readGrammarFile("./src/lib/grammar/cfg.txt")))
+def writeGrammar(grammar, file):
+    with open(file, 'w') as f:
+        for rule in grammar:
+            f.write(rule + " -> ")
+            for i in range(len(grammar[rule])):
+                f.write(grammar[rule][i])
+                if i != len(grammar[rule]) - 1:
+                    f.write(" | ")
+            f.write("\n")
+
+writeGrammar(mapGrammar(convertGrammar(readGrammar("cfg.txt"))), "cnf.txt")
