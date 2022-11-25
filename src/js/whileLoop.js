@@ -1,5 +1,4 @@
 while (i < a) {
-  console.log(i + 5);
-
+  console.log("hello world"+ " ADAD");
   i++;
 }

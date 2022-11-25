@@ -27,7 +27,7 @@ def bannerCompiler() :
 # for line in f:
 #   print(line)
 
-writeGrammar(convertGrammar(readGrammarFile("lib/grammar/cfg.txt")))
+makeCNF(grammarChange(readGrammar("lib/grammar/cfg.txt")))
 bannerCompiler()
 d = input("Masukkan nama file : ")
 print()
@@ -38,10 +38,10 @@ print()
 print("----------------------------------")
 print()
 
-token = createToken("js/" + d)
+token = makeToken("js/" + d)
 token = [i.lower() for i in token]
 
-grammarCNF = mapGrammar(convertGrammar((readGrammarFile("lib/grammar/cfg.txt"))))
+grammarCNF = takeCNF(grammarChange((readGrammar("lib/grammar/cfg.txt"))))
 # print(grammarCNF)
 cykParser(token, grammarCNF)
 print()
