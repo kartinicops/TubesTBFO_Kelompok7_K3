@@ -1,10 +1,6 @@
-import argparse
 from tokenizer import *
-from lib.grammar.cfgtocnf import mapGrammar
-from lib.grammar.cfgtocnf import convertGrammar
-from lib.grammar.cfgtocnf import readGrammarFile
+from lib.grammar.cfgtocnf import *
 from lib.cykparser import cykParser
-from lib.grammar.cfgtocnf import writeGrammar
 
 
 
@@ -42,7 +38,7 @@ print()
 print("----------------------------------")
 print()
 
-token = createToken(d)
+token = createToken("js/" + d)
 token = [i.lower() for i in token]
 
 grammarCNF = mapGrammar(convertGrammar((readGrammarFile("lib/grammar/cfg.txt"))))
