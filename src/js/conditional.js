@@ -1,6 +1,3 @@
-let get = 0;
-let score = undefined;
-
 if (score < 50) {
   score = "D";
 } else if (score < 65) {
