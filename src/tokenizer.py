@@ -3,7 +3,7 @@ import re
 import os
 
 
-tokendict = [ 
+dictionary = [ 
     (r'[ ]+', None),
     (r'[\t]+', None),
     (r'//[^\n]*', None),
@@ -87,72 +87,47 @@ tokendict = [
     (r'[a-zA-Z_][a-zA-Z0-9_]*', "VAR"),
 ]
 
-
-# multLine1 = r'[\n]+[ \t]*\'\'\'[(?!(\'\'\'))\w\W]*\'\'\''
-# multLine2 = r'[\n]+[ \t]*\"\"\"[(?!(\"\"\"))\w\W]*\"\"\"'
-
-def lex(text, tokendict):
+def read(text, dict):
     line = 1            
-    pos = 0             
-    currPos = 1         
-    tokens = []
-    while (pos < len(text)):
-        # print("test")
-        # print("pos = ", pos)
-        # print(len(text))
-        if text[pos] == '\n':
+    cp = 1
+    position = 0             
+    lengthteks = len(text)         
+    arrans = []
+    while (position < lengthteks):
+        if text[position] == '\n':
             line += 1
-            currPos = 1
-
-        flag = None
-        # break
-        for tokenExpr in tokendict:
+            cp = 1
+        cek = None
+        for tokenExpr in dict:
             pattern, tag = tokenExpr    
-            # if line == 1:
-            #     if pattern == multLine1:
-            #         pattern = r'[^\w]*[ \t]*\'\'\'[(?!(\'\'\'))\w\W]*\'\'\''
-            #     elif pattern == multLine2:
-            #         pattern = r'[^\w]*[ \t]*\"\"\"[(?!(\"\"\"))\w\W]*\"\"\"'
-
             regex = re.compile(pattern)
-            flag = regex.match(text, pos)
-
-            if flag:
-                # texts = flag.group(0)
+            cek = regex.match(text, position)
+            if cek:
                 if tag:
                     token = tag
-                    tokens.append(token)
+                    arrans.append(token)
                 break
 
-        if not flag:
-            print(f"\nSYNTAX ERROR\nIllegal character {text[pos]} at line {line} and column {currPos}")
+        if not cek:
+            print(f"\nERROR!!!\nkarakter ilegal '{text[position]}'. baris {line} kolom {cp}")
             sys.exit(1)
         else:
-            # print("masuk sini gak")
-            pos = flag.end(0)
-        currPos += 1
+            position = cek.end(0)
+        cp += 1
+    return arrans
 
-    return tokens
-
-def createToken(text):
-    # Read file
-    file = open(text, encoding="utf8")
-    characters = file.read()
-    file.close()
-
-    tokens = lex(characters, tokendict)
-    tokenResult = []
-
-    for token in tokens:
-        tokenResult.append(token)
-
-
-    # Write file
-    path = os.getcwd()
-    fileWrite = open(path + "/result/tokenResult.txt", 'w')
-    for token in tokenResult:
-        fileWrite.write(str(token)+" ")
-        # print(token)
-    fileWrite.close()
-
-    return tokenResult
+def makeToken(text):
+    f = open(text, encoding="utf8")
+    word = f.read()
+    f.close()
+    varr = read(word, dictionary)
+    res = []
+    for i in varr:
+        res.append(i)
+    
+    a = os.getcwd()
+    resultFile = open(a + "/result/Result.txt", 'w')
+    for token in res:
+        resultFile.write(str(token)+" ")
+    resultFile.close()
+    return res

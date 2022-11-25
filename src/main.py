@@ -1,9 +1,6 @@
-import argparse
 from tokenizer import *
-from lib.grammar.cfgtocnf import mapGrammar
-from lib.grammar.cfgtocnf import convertGrammar
-from lib.grammar.cfgtocnf import readGrammar
-from lib.grammar.cykparser import cykParser
+from lib.grammar.cfgtocnf import *
+from lib.cykparser import cykParser
 
 
 
@@ -26,17 +23,26 @@ def bannerCompiler() :
 
 
 
-parser = argparse.ArgumentParser()
-parser.add_argument('file', type = argparse.FileType('r'), help = 'konversi file')
-arg  = parser.parse_args()
 
-f = arg.file
+# for line in f:
+#   print(line)
 
-for line in f:
-  print(line)
-    
-
+makeCNF(grammarChange(readGrammar("lib/grammar/cfg.txt")))
 bannerCompiler()
-token = createToken(arg.file.name)
-grammarCNF = mapGrammar(convertGrammar(readGrammar(arg.file.name)))
+d = input("Masukkan nama file : ")
+print()
+print("----------------------------------")
+print()
+print("compiling...")
+print()
+print("----------------------------------")
+print()
+
+token = makeToken("js/" + d)
+token = [i.lower() for i in token]
+
+grammarCNF = takeCNF(grammarChange((readGrammar("lib/grammar/cfg.txt"))))
+# print(grammarCNF)
 cykParser(token, grammarCNF)
+print()
+print("----------------------------------")

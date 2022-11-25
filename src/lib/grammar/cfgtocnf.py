@@ -1,67 +1,79 @@
 import keyword
+
 terminal = keyword.kwlist
-ruleDict = {}
 
-def readGrammar(file) :
-  grammar = []
-  with open(file) as f:
-    for line in f:
-      grammar.append(line.split())
-  return grammar
+allRule = {}
 
-def displayGrammar(grammar) :
-  for rule in grammar :
-    print(rule[0], " -> ", end = "")
-    for i in range(1, len(rule)) :
-      print(rule[i], end = "")
-      print(" ", end = "")
-    print()
+def readGrammar(file):
+  with open(file) as cfg_file:
+    baris = cfg_file.readlines()
+    barisConverted = []
+    for i in range(len(baris)):
+      splitBaris = baris[i].replace("->", "").split()
+      barisConverted.append(splitBaris)
+  return barisConverted
 
-def appendRule(rule):
-  global ruleDict
-  if rule[0] not in ruleDict:
-    ruleDict[rule[0]] = []
-  ruleDict[rule[0]].append(rule[1:])
+def makeGrammar(rule):
+  global allRule
+  
+  if rule[0] not in allRule:
+    allRule[rule[0]] = []
+  allRule[rule[0]].append(rule[1:])
 
-def convertGrammar(grammar):
-  global ruleDict
-  for rule in grammar:
-    if len(rule) == 2:
-      appendRule(rule)
-    else:
-      newRule = []
-      newRule.append(rule[0])
-      for i in range(1, len(rule) - 1):
-        newRule.append(rule[i])
-        newRule.append(rule[i] + "'")
-        appendRule(newRule)
-        newRule = []
-        newRule.append(rule[i] + "'")
-      newRule.append(rule[len(rule) - 1])
-      appendRule(newRule)
-  return ruleDict 
-
-def mapGrammar(grammar):
-    global terminal
-    newGrammar = {}
+def grammarChange(grammar):
+    global allRule
+    idx = 0
+    unitProductions, res = [], []
     for rule in grammar:
-        if rule[0] not in newGrammar:
-            newGrammar[rule[0]] = []
-        if rule[1] in terminal:
-            newGrammar[rule[0]].append(rule[1])
-        else:
-            for i in grammar[rule[1]]:
-                newGrammar[rule[0]].append(i)
-    return newGrammar
+      new_rules = []
+      if len(rule) == 2 and not rule[1][0].islower() :
+        unitProductions.append(rule)
+        makeGrammar(rule)
+        continue
+      while len(rule) > 3:
+        
+        new_rules.append([f"{rule[0]}{idx}", rule[1], rule[2]])
+        rule = [rule[0]] + [f"{rule[0]}{idx}"] + rule[3:]
+        idx += 1
+      if rule:
+        makeGrammar(rule)
+        res.append(rule)
+      if new_rules:
+        for i in range(len(new_rules)):
+          res.append(new_rules[i])
 
-def writeGrammar(grammar, file):
-    with open(file, 'w') as f:
-        for rule in grammar:
-            f.write(rule + " -> ")
-            for i in range(len(grammar[rule])):
-                f.write(grammar[rule][i])
-                if i != len(grammar[rule]) - 1:
-                    f.write(" | ")
-            f.write("\n")
+    while unitProductions:
+      # print(unitProductions)
+      rule = unitProductions.pop() 
+      if rule[1] in allRule:
+        for item in allRule[rule[1]]:
+          new_rule = [rule[0]] + item
+          if len(new_rule) > 2 or new_rule[1][0].islower():
+            res.append(new_rule)
+          else:
+            unitProductions.append(new_rule)
+          makeGrammar(new_rule)
+    return res
 
-writeGrammar(mapGrammar(convertGrammar(readGrammar("cfg.txt"))), "cnf.txt")
+def takeCNF(grammar):
+  arr = {}
+  for rule in grammar :
+    arr[str(rule[0])] = []
+  for rule in grammar :
+    elm = []
+    for idxRule in range(1, len(rule)) :
+      apd = rule[idxRule]
+      elm.append(apd)
+    arr[str(rule[0])].append(elm)
+  return arr
+
+def makeCNF(grammar):
+    cnffile = open('lib\grammar\cnf.txt', 'w')
+    for rule in grammar:
+        cnffile.write(rule[0])
+        cnffile.write(" -> ")
+        for i in rule[1:]:
+            cnffile.write(i)
+            cnffile.write(" ")
+        cnffile.write("\n")
+    cnffile.close()
